@@ -1,7 +1,12 @@
 <?php
-/**
- * Created by PhpStorm.
- * User: ADMIN
- * Date: 1/25/2021
- * Time: 1:33 PM
- */
+namespace App\Repositories;
+
+use App\Models\Notification;
+use Jenssegers\Mongodb\Eloquent\Model;
+
+class NotifiRepository extends BaseRepository {
+     public function __construct(Notification $model)
+     {
+         parent::__construct($model);
+     }
+ }

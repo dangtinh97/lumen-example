@@ -7,12 +7,13 @@ use Illuminate\Auth\Authenticatable;
 use Illuminate\Contracts\Auth\Access\Authorizable as AuthorizableContract;
 use Illuminate\Contracts\Auth\Authenticatable as AuthenticatableContract;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
-
 use Jenssegers\Mongodb\Eloquent\Model;
 use Laravel\Lumen\Auth\Authorizable;
+use Tymon\JWTAuth\Contracts\JWTSubject;
 
-class User extends Model implements AuthenticatableContract, AuthorizableContract
+class User extends Model implements AuthenticatableContract, AuthorizableContract,JWTSubject
 {
+    protected $collection = 'users';
     use Authenticatable, Authorizable, HasFactory, SoftDeletes;
 
     /**
@@ -21,7 +22,8 @@ class User extends Model implements AuthenticatableContract, AuthorizableContrac
      * @var array
      */
     protected $fillable = [
-        'full_name', 'email','mobile','password'
+       'full_name', 'password','birthday','gender','email','phone',
+        'avatar'
     ];
 
     /**
@@ -32,4 +34,15 @@ class User extends Model implements AuthenticatableContract, AuthorizableContrac
     protected $hidden = [
         'password',
     ];
+//    public function user(){
+//        return $this->belongsTo(User::class);
+//    }
+    public function getJWTIdentifier()
+{
+    return $this->getKey();
+}
+    public function getJWTCustomClaims()
+{
+    return [];
+}
 }
