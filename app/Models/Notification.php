@@ -8,12 +8,13 @@ use Illuminate\Contracts\Auth\Access\Authorizable as AuthorizableContract;
 use Illuminate\Contracts\Auth\Authenticatable as AuthenticatableContract;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Jenssegers\Mongodb\Eloquent\Model;
+
 use Laravel\Lumen\Auth\Authorizable;
 use Tymon\JWTAuth\Contracts\JWTSubject;
 
-class User extends Model implements AuthenticatableContract, AuthorizableContract,JWTSubject
+class Notification extends Model implements AuthenticatableContract, AuthorizableContract,JWTSubject
 {
-    protected $collection = 'users';
+    protected $collection = 'notifications';
     use Authenticatable, Authorizable, HasFactory, SoftDeletes;
 
     /**
@@ -22,8 +23,7 @@ class User extends Model implements AuthenticatableContract, AuthorizableContrac
      * @var array
      */
     protected $fillable = [
-       'full_name', 'password','birthday','gender','email','phone',
-        'avatar'
+       'id_user_create_post','id_user_create_notification','id_post','type'
     ];
 
     /**
@@ -38,11 +38,11 @@ class User extends Model implements AuthenticatableContract, AuthorizableContrac
 //        return $this->belongsTo(User::class);
 //    }
     public function getJWTIdentifier()
-{
-    return $this->getKey();
-}
+    {
+        return $this->getKey();
+    }
     public function getJWTCustomClaims()
-{
-    return [];
-}
+    {
+        return [];
+    }
 }
