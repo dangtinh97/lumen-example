@@ -6,6 +6,7 @@ namespace App\Repositories;
 
 use App\Models\User;
 use Jenssegers\Mongodb\Eloquent\Model;
+use MongoDB\BSON\ObjectId;
 
 class UserRepository extends BaseRepository
 {

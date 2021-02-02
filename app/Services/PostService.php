@@ -2,24 +2,20 @@
 
 namespace App\Services;
 
+use App\Http\Responses\StatusCode;
 use Illuminate\Support\Facades\Auth;
 use App\Http\Responses\ResponseError;
 use App\Http\Responses\ResponseSuccess;
 use App\Repositories\PostRepository;
-use App\Repositories\UserRepository;
 use MongoDB\BSON\ObjectId;
-use phpDocumentor\Reflection\Types\This;
 
 class PostService
 {
     protected $postRepository;
-    protected $userRepository;
 
-
-    public function __construct(PostRepository $postRepository, UserRepository $userRepository)
+    public function __construct(PostRepository $postRepository)
     {
         $this->postRepository = $postRepository;
-        $this->userRepository = $userRepository;
     }
 
     public function create($request)
@@ -27,67 +23,63 @@ class PostService
         $create = $this->postRepository->create([
             'id_user' => new ObjectId(Auth::id()),
             'content' => $request->get('content'),
-            'photos'=>$request->get('photo'),
+            'photos' => $request->get('photo'),
         ]);
 
-            return (new ResponseSuccess($create, 'tao bai viet thành công!'));
+        return (new ResponseSuccess($create, 'tao bai viet thành công!'));
     }
 
     public function update($request, $id)
     {
-        $getDocs = $this->postRepository->where('id_user',new ObjectId(Auth::id()))->first();
+
+        $getDocs = $this->postRepository->where('id_user', new ObjectId(Auth::id()))->first();
         $getId = $getDocs->_id;
-        if ($getId === $id){
+        if ($getId === $id) {
             $update = $getDocs->update([
                 'id_user' => new ObjectId(Auth::id()),
                 'content' => $request->get('content'),
-                'photos'=>$request->get('photo'),
+                'photos' => $request->get('photo'),
             ]);
             return (new ResponseSuccess($update, 'Sua bai viet thanh cong!'));
 
         }
-        return (new ResponseError('', 'Khong dung bai post!'));
+        return (new ResponseError(StatusCode::BAD_REQUEST, 'Khong dung bai post!'));
 
     }
 
-    public function delete($request, $id)
+    public function delete($id)
     {
-        $getDocs = $this->postRepository->where('id_user',new ObjectId(Auth::id()))->first();
+        $getDocs = $this->postRepository->where('id_user', new ObjectId(Auth::id()))->first();
         $getId = $getDocs->_id;
         if ($getId === $id) {
             $getDocs->delete();
             return (new ResponseSuccess($getDocs, 'Xoa thanh cong!'));
         }
-            return (new ResponseError('', 'Khong dung bai post!'));
-
+        return (new ResponseError(StatusCode::BAD_REQUEST, 'Khong dung bai post!'));
     }
 
-    public function getPost_UserLogin()
+    public function getPostUser($id_user)
     {
-        $options = [];
-        $pipeline = [
-            [
-                '$lookup' => [
-                    'from' => 'users',
-                    'localField' => 'id_user',
-                    'foreignField' => '_id',
-                    'as' => 'docs'
-                ]
-            ]
-        ];
-//        dd($pipeline);
-        $cursor = $this->userRepository->aggregate($pipeline, $options);
-
-        foreach ($cursor as $document) {
-            return $document['full_name'] . "\n";
+        $array = [];
+        $getData = $this->postRepository->getPostByUser($id_user);
+//        dd($getData);
+        foreach ($getData as $document) {
+            $arr = ['content' => $document->content, 'photos' => $document->photos, 'created_at' => $document->created_at, 'username' => $document->user['full_name'],'user_id'=>(string)$document->user['_id']];
+            array_push($array, $arr);
         }
-//        $getAllPost = $this->postRepository->where('id_user', $this->id_user)->get();
-//        return (new ResponseSuccess($getAllPost, 'Thanh cong!'));
+        return (new ResponseSuccess(['posts' => $array], 'Thanh cong!'));
     }
 
     public function getAllPost()
+
     {
-        $getAllPost = $this->postRepository->all();
-        return (new ResponseSuccess($getAllPost, 'Lay tat ca ban ghi thanh cong!'));
+        $array = [];
+        $getAllPost = $this->postRepository->getPostByUser();
+//        dd($getAllPost);
+        foreach ($getAllPost as $document) {
+            $arr = ['content' => $document->content, 'photos' => $document->photos, 'created_at' => $document->created_at, 'username' => $document->user['full_name'],'user_id'=>(string)$document->user['_id']];
+            array_push($array, $arr);
+        }
+        return (new ResponseSuccess(['posts' => $array], 'Thanh cong!'));
     }
 }

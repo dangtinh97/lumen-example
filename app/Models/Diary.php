@@ -7,14 +7,16 @@ use Illuminate\Auth\Authenticatable;
 use Illuminate\Contracts\Auth\Access\Authorizable as AuthorizableContract;
 use Illuminate\Contracts\Auth\Authenticatable as AuthenticatableContract;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
+use Illuminate\Support\Facades\Auth;
 use Jenssegers\Mongodb\Eloquent\Model;
 
 use Laravel\Lumen\Auth\Authorizable;
+use Tymon\JWTAuth\Contracts\JWTSubject;
 use MongoDB\BSON\ObjectId;
 
-class Post extends Model implements AuthenticatableContract, AuthorizableContract
+class Diary extends Model implements AuthenticatableContract, AuthorizableContract,JWTSubject
 {
-    protected $collection = 'posts';
+    protected $collection = 'diaries';
     use Authenticatable, Authorizable, HasFactory, SoftDeletes;
 
     /**
@@ -23,7 +25,7 @@ class Post extends Model implements AuthenticatableContract, AuthorizableContrac
      * @var array
      */
     protected $fillable = [
-        'id_user','content','photos'
+        'id_user_create_diary','id_post','type'
     ];
 
     /**
@@ -32,7 +34,7 @@ class Post extends Model implements AuthenticatableContract, AuthorizableContrac
      * @var array
      */
     protected $hidden = [
-        'password','token'
+        'password',
     ];
 //    public function user(){
 //        return $this->belongsTo(User::class);
@@ -45,48 +47,43 @@ class Post extends Model implements AuthenticatableContract, AuthorizableContrac
     {
         return [];
     }
-    public function getPostByUser($id_user){
-        $options = [
-            'typeMap'=>[
-                'array'=>'array',
-                'document'=>'array',
-                'root'=>'array',
-            ]
+    public function getDiary(){
+        $option = [
+          'typeMap'=>[
+              'array'=>'array',
+              'document'=>'array',
+              'root'=>'array',
+          ]
         ];
         $pipeline = [
-
             [
                 '$match'=>[
                     'deleted_flag'=>false,
-//                    '_id'=>new ObjectId($id_user),
+                    'id_user_create_diary'=>new ObjectId(Auth::id()),
                 ]
             ],
             [
-
-                '$lookup' => [
-                    'from' => 'users',
-                    'localField' => 'id_user',
-                    'foreignField' => '_id',
-                    'as' => 'user'
+                '$lookup'=>[
+                    'from'=>'users',
+                    'localField'=>'id_user_create_diary',
+                    'foreignField'=>'_id',
+                    'as'=>'user'
                 ]
             ],
             [
                 '$project'=>[
-                    'content'=>1,
-                    'photos'=>1,
+                    'id_post'=>1,
+                    'type'=>1,
                     'created_at'=>1,
                     'user'=>[
-                        '$arrayElemAt'=> [ '$user', 0 ],
-                    ]
+                        '$arrayElemAt'=>['$user',0],
+                        ]
                 ]
             ]
-        ];
 
-        if(!is_null($id_user)){
-            $pipeline[0]['$match']['id_user']=new ObjectId($id_user);
-        }
-        $result = self::raw(function ($collection) use ($pipeline,$options){
-            return $collection->aggregate($pipeline, $options);
+        ];
+        $result = self::raw(function ($collection) use ($pipeline,$option){
+           return $collection->aggregate($pipeline,$option);
         });
         return $result;
     }
