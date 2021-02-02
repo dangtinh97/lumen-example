@@ -2,8 +2,8 @@
 
 namespace App\Services;
 
+use App\Http\Responses\StatusCode;
 use Illuminate\Support\Facades\Auth;
-//use App\Models\User;
 use App\Http\Responses\ResponseError;
 use App\Http\Responses\ResponseSuccess;
 use App\Repositories\UserRepository;
@@ -38,7 +38,7 @@ class UserService
     {
         $credentials = request(['email', 'password']);
         if (!$token = Auth::attempt($credentials)) {
-            return (new ResponseError('', 'Email hoac password khong dung!'));
+            return (new ResponseError(StatusCode::BAD_REQUEST, 'Email hoac password khong dung!'));
         }
 
         return (new ResponseSuccess(['token' => $token], 'Dang nhap thanh cong!'));
@@ -46,7 +46,7 @@ class UserService
     public function logout()
     {
         Auth::logout();
-        return (new ResponseSuccess('', 'Dang xuat thanh cong'));
+        return (new ResponseSuccess(StatusCode::SUCCESS, 'Dang xuat thanh cong'));
     }
     public function update($request)
     {
@@ -88,7 +88,7 @@ class UserService
             if (!in_array($extension, $arr_extension)) {
                 $update->avatar = '';
 //                    $request->get('avatar')== '';
-                return (new ResponseError('', 'Update that bai!'));
+                return (new ResponseError(StatusCode::BAD_REQUEST, 'Update that bai!'));
             } else {
                 $update->avatar = $request->get('avatar');
                 $update->save();
@@ -107,7 +107,7 @@ class UserService
             $delete->delete();
             return (new ResponseSuccess($delete, 'Xoa thanh cong!'));
         }
-        return (new ResponseError('', 'Xoa that bai'));
+        return (new ResponseError(StatusCode::BAD_REQUEST, 'Xoa that bai'));
     }
 
 
@@ -120,7 +120,7 @@ class UserService
 //        ]);
 //    }
 
-    public function getUserInfo()
+    public function getUserLogin()
     {
         $user = Auth::user();
         return (new ResponseSuccess($user, 'Thong tin user'));

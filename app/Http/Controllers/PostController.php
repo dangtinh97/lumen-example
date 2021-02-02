@@ -27,12 +27,12 @@ class PostController extends Controller{
         $update = $this->postService->update($request,$id);
         return response()->json($update->toArray());
     }
-    public function delete(Request $request, $id){
-        $delete = $this->postService->delete($request, $id);
+    public function delete($id){
+        $delete = $this->postService->delete($id);
         return response()->json($delete->toArray());
     }
-    public function getPost_UserLogin(){
-        $getPost_UserLogin = $this->postService->getPost_UserLogin();
+    public function getPostUser($id_user){
+        $getPost_UserLogin = $this->postService->getPostUser($id_user);
         return response()->json($getPost_UserLogin->toArray());
     }
     public function getAllPost(){

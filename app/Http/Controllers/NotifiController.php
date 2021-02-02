@@ -14,13 +14,13 @@ class NotifiController extends Controller{
         return response()->json($create->toArray());
     }
 
-    public function listNotification(Request $request){
-        $listNotification = $this->notifiService->listNotification($request);
+    public function listNotification(){
+        $listNotification = $this->notifiService->listNotification();
         return response()->json($listNotification->toArray());
     }
 
-    public function delete(Request $request,$id_notification){
-        $delete = $this->notifiService->delete($request,$id_notification);
+    public function delete($id_notification){
+        $delete = $this->notifiService->delete($id_notification);
         return response()->json($delete->toArray());
     }
 }

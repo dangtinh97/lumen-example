@@ -41,8 +41,8 @@ class BaseRepository
     public function get(){
         return $this->model::get();
     }
-//    public function aggregate($id=[],$id_user=[]){
-//        return $this->model::aggregate($id=[],$id_user=[]);
+//    public function getData($id){
+//        return $this->model::;
 //    }
 
 }
