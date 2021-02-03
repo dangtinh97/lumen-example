@@ -46,13 +46,14 @@ $router->get('/', function () use ($router) {
 
 $router->post('login', 'UserController@login');
 $router->post('user', 'UserController@create');
+$router->get('getUser/{id}', 'UserController@getUser');
+
 
 $router->group(['prefix' => '', 'middleware' => 'api'], function () use ($router) {
     #USER
     $router->patch('user', 'UserController@update');
     $router->delete('user', 'UserController@delete');
     $router->post('logout', 'UserController@logout');
-    $router->get('getUserLogin', 'UserController@getUserLogin');
 
     #POST
     $router->post('post', 'PostController@create');

@@ -24,6 +24,7 @@ class UserService
         $create = $this->userRepository->create([
             'full_name' => $request->get('full_name'),
             'password' => Hash::make($request->get('password')),
+            //hoac md5
             'birthday' => date('Y-m-d', strtotime($request->get('birthday'))),
             'gender' => $request->get('gender'),
             'email' => $request->get('email'),
@@ -68,7 +69,7 @@ class UserService
 //        ]);
             $update->full_name = $request->get('full_name');
 //        dd($update->full_name);
-            $update->password = Hash::make($request->get('password'));
+            $update->password = ($request->get('password'));
             $update->birthday = $request->get('birthday');
             $update->gender = $request->get('gender');
             $update->phone = $request->get('phone');
@@ -120,9 +121,14 @@ class UserService
 //        ]);
 //    }
 
-    public function getUserLogin()
+    public function getUser($id)
     {
-        $user = Auth::user();
-        return (new ResponseSuccess($user, 'Thong tin user'));
+   $getUser = $this->userRepository->findById($id);
+//   dd($getUser);
+   if ($getUser)  {
+       return (new ResponseSuccess($getUser, 'Thong tin user'));
+   }
+   return (new ResponseError(StatusCode::BAD_REQUEST, 'Khong tim thay user'));
+
     }
 }

@@ -42,17 +42,9 @@ class DiaryService
 
     public function delete($id_diary)
     {
-        $array = [];
-        $listDiary = $this->diaryRepository->getDiary();
-        foreach ($listDiary as $diary) {
-            $arr = $diary->_id;
-            array_push($array, $arr);
-        }
-        if (in_array($id_diary, $array)) {
-            $delete = $this->diaryRepository->where('_id', new ObjectId($id_diary))->first();
-            $delete->delete();
-            return (new ResponseSuccess($delete, 'Thanh cong'));
-        }
-        return (new ResponseError(StatusCode::BAD_REQUEST, 'Khong dung nhat ky!'));
+        $find = $this->diaryRepository->find(['_id'=> $id_diary,'id_user_create_diary'=>new ObjectId(Auth::id())])->first();
+        if (is_null($find)) return (new ResponseError(StatusCode::BAD_REQUEST,'Ban khong the xoa nhat ky'));
+        $find->delete();
+        return (new ResponseSuccess([],'Xoa nhat ky thanh cong'));
     }
 }

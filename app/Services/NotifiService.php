@@ -2,6 +2,7 @@
 
 namespace App\Services;
 
+use App\Http\Responses\StatusCode;
 use App\Repositories\DiaryRepository;
 use Illuminate\Support\Facades\Auth;
 use App\Http\Responses\ResponseError;
@@ -57,26 +58,15 @@ class NotifiService
                 'username' => $document->user['full_name'], 'user_id' => (string)$document->user['_id'], 'type' => $document->type, 'id_post' => (string)$document->id_post,];
             array_push($array, $arr);
         }
-//        $listNotification = $this->notification->where('id_user_create_post', new ObjectId(Auth::id()))
-//            ->whereAnd('id_user_create_notification', '<>', new ObjectId(Auth::id()))->get();
         return (new ResponseSuccess(['notifications' => $array], 'Lay ban ghi thanh cong'));
     }
 
     public function delete($id_notification)
     {
-        $array = [];
-        $getUser = $this->notification->getUser();
-//        dd($id_notification);
-        foreach ($getUser as $document) {
-            $arr = $document->_id;
-            array_push($array, $arr);
-        }
-        if (in_array($id_notification, $array)) {
-            $delete = $this->notification->where('_id', $id_notification)->first();
-            $delete->delete();
-            return (new ResponseSuccess($delete, 'Xoa thong bao thanh cong'));
-        }
-        return (new ResponseError('', 'Xoa thong bao that bai'));
+        $find = $this->notification->find(['_id'=> $id_notification,'id_user_create_post'=>new ObjectId(Auth::id())])->first();
+        if (is_null($find)) return (new ResponseError(StatusCode::BAD_REQUEST,'Ban khong the xoa thong bao'));
+        $find->delete();
+        return (new ResponseSuccess([],'Xoa thong bao thanh cong'));
 
     }
 

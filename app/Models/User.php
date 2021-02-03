@@ -32,7 +32,7 @@ class User extends Model implements AuthenticatableContract, AuthorizableContrac
      * @var array
      */
     protected $hidden = [
-        'password',
+        'password','deleted_flag'
     ];
 //    public function user(){
 //        return $this->belongsTo(User::class);

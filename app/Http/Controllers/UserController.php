@@ -48,8 +48,8 @@ class UserController extends Controller{
         $logout = $this->userService->logout();
         return response()->json($logout->toArray());
     }
-    public function getUserLogin(){
-        $user = $this->userService->getUserLogin();
+    public function getUser($id){
+        $user = $this->userService->getUser($id);
         return response()->json($user->toArray());
     }
 }

@@ -3,6 +3,7 @@
 namespace App\Services;
 
 use App\Http\Responses\StatusCode;
+use function Couchbase\defaultDecoder;
 use Illuminate\Support\Facades\Auth;
 use App\Http\Responses\ResponseError;
 use App\Http\Responses\ResponseSuccess;
@@ -32,9 +33,10 @@ class PostService
     public function update($request, $id)
     {
 
-        $getDocs = $this->postRepository->where('id_user', new ObjectId(Auth::id()))->first();
-        $getId = $getDocs->_id;
-        if ($getId === $id) {
+        $getDocs = $this->postRepository->where('_id', new ObjectId($id))->first();
+        $getUserId = $getDocs->id_user->__toString();
+//        dd($getUserId);
+        if ($getUserId === Auth::id()) {
             $update = $getDocs->update([
                 'id_user' => new ObjectId(Auth::id()),
                 'content' => $request->get('content'),
@@ -49,22 +51,19 @@ class PostService
 
     public function delete($id)
     {
-        $getDocs = $this->postRepository->where('id_user', new ObjectId(Auth::id()))->first();
-        $getId = $getDocs->_id;
-        if ($getId === $id) {
-            $getDocs->delete();
-            return (new ResponseSuccess($getDocs, 'Xoa thanh cong!'));
-        }
-        return (new ResponseError(StatusCode::BAD_REQUEST, 'Khong dung bai post!'));
+        $find = $this->postRepository->find(['_id'=>$id,'id_user'=>new ObjectId(Auth::id())])->first();
+        if(is_null($find))   return (new ResponseError(StatusCode::BAD_REQUEST, 'Ban khong the xoa bai post!'));
+        $find->delete();
+        return (new ResponseSuccess($find, 'Xoa bai post thanh cong!'));
+
     }
 
     public function getPostUser($id_user)
     {
         $array = [];
         $getData = $this->postRepository->getPostByUser($id_user);
-//        dd($getData);
         foreach ($getData as $document) {
-            $arr = ['content' => $document->content, 'photos' => $document->photos, 'created_at' => $document->created_at, 'username' => $document->user['full_name'],'user_id'=>(string)$document->user['_id']];
+            $arr = ['content' => $document->content, 'photos' => $document->photos, 'created_at' => $document->created_at, 'username' => $document->user['full_name'], 'user_id' => (string)$document->user['_id']];
             array_push($array, $arr);
         }
         return (new ResponseSuccess(['posts' => $array], 'Thanh cong!'));
@@ -75,11 +74,16 @@ class PostService
     {
         $array = [];
         $getAllPost = $this->postRepository->getPostByUser();
-//        dd($getAllPost);
+//        $getAllPost->take(2);
+//        {
+//            {
+//                $getAllPost->links();
+//            }
+//        }
         foreach ($getAllPost as $document) {
             $arr = ['content' => $document->content, 'photos' => $document->photos, 'created_at' => $document->created_at, 'username' => $document->user['full_name'],'user_id'=>(string)$document->user['_id']];
             array_push($array, $arr);
         }
-        return (new ResponseSuccess(['posts' => $array], 'Thanh cong!'));
+        return (new ResponseSuccess($array, 'Thanh cong!'));
     }
 }
