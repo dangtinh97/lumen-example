@@ -79,7 +79,12 @@ class Diary extends Model implements AuthenticatableContract, AuthorizableContra
                         '$arrayElemAt'=>['$user',0],
                         ]
                 ]
-            ]
+            ],
+            [
+                '$sort' => [
+                    '_id' => -1,
+                ]
+            ],
 
         ];
         $result = self::raw(function ($collection) use ($pipeline,$option){

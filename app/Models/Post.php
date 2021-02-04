@@ -23,7 +23,7 @@ class Post extends Model implements AuthenticatableContract, AuthorizableContrac
      * @var array
      */
     protected $fillable = [
-        'id_user','content','photos'
+        'id_user', 'content', 'photos'
     ];
 
     /**
@@ -32,7 +32,7 @@ class Post extends Model implements AuthenticatableContract, AuthorizableContrac
      * @var array
      */
     protected $hidden = [
-        'password','token'
+        'password', 'token'
     ];
 //    public function user(){
 //        return $this->belongsTo(User::class);
@@ -41,23 +41,26 @@ class Post extends Model implements AuthenticatableContract, AuthorizableContrac
     {
         return $this->getKey();
     }
+
     public function getJWTCustomClaims()
     {
         return [];
     }
-    public function getPostByUser($id_user){
+
+    public function getPostByUser($id_user)
+    {
         $options = [
-            'typeMap'=>[
-                'array'=>'array',
-                'document'=>'array',
-                'root'=>'array',
+            'typeMap' => [
+                'array' => 'array',
+                'document' => 'array',
+                'root' => 'array',
             ]
         ];
         $pipeline = [
 
             [
-                '$match'=>[
-                    'deleted_flag'=>false,
+                '$match' => [
+                    'deleted_flag' => false,
 //                    '_id'=>new ObjectId($id_user),
                 ]
             ],
@@ -71,21 +74,30 @@ class Post extends Model implements AuthenticatableContract, AuthorizableContrac
                 ]
             ],
             [
-                '$project'=>[
-                    'content'=>1,
-                    'photos'=>1,
-                    'created_at'=>1,
-                    'user'=>[
-                        '$arrayElemAt'=> [ '$user', 0 ],
+                '$project' => [
+                    'content' => 1,
+                    'photos' => 1,
+                    'created_at' => 1,
+                    'user' => [
+                        '$arrayElemAt' => ['$user', 0],
                     ]
                 ]
-            ]
+            ],
+            [
+                '$sort' => [
+                    '_id' => -1,
+                ]
+            ],
+//            [
+//                '$limit'=>2,
+//            ],
+
         ];
 
-        if(!is_null($id_user)){
-            $pipeline[0]['$match']['id_user']=new ObjectId($id_user);
+        if (!is_null($id_user)) {
+            $pipeline[0]['$match']['id_user'] = new ObjectId($id_user);
         }
-        $result = self::raw(function ($collection) use ($pipeline,$options){
+        $result = self::raw(function ($collection) use ($pipeline, $options) {
             return $collection->aggregate($pipeline, $options);
         });
         return $result;

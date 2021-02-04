@@ -82,7 +82,12 @@ class Notification extends Model implements AuthenticatableContract, Authorizabl
                         '$arrayElemAt'=> [ '$user', 0 ],
                     ]
                 ]
-            ]
+            ],
+            [
+                '$sort' => [
+                    '_id' => -1,
+                ]
+            ],
         ];
 
         $result = self::raw(function ($collection) use ($pipeline,$option){

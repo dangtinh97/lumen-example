@@ -84,6 +84,6 @@ class PostService
             $arr = ['content' => $document->content, 'photos' => $document->photos, 'created_at' => $document->created_at, 'username' => $document->user['full_name'],'user_id'=>(string)$document->user['_id']];
             array_push($array, $arr);
         }
-        return (new ResponseSuccess($array, 'Thanh cong!'));
+        return (new ResponseSuccess(['posts'=>$array], 'Thanh cong!'));
     }
 }
