@@ -17,9 +17,33 @@ $router->get('/', function () use ($router) {
     return response()->json((new \App\Http\Responses\ResponseError(\App\Http\Responses\StatusCode::NOT_FOUND,'not found'))->toArray());
 });
 
+$router->post('login', 'UserController@login');
+$router->post('user', 'UserController@create');
 
-$router->group(['prefix'=>'example'],function () use ($router){
-   $router->post('/','ExampleController@store');
+$router->group(['prefix'=>'/', 'middleware'=>'api'], function () use ($router){
+    $router->group(['prefix'=>'comment'], function () use ($router){
+        $router->get('', 'CommentController@index');
+        $router->post('', 'CommentController@store');
+        $router->put('/{id}', 'CommentController@update');
+        $router->delete('/{id}', 'CommentController@destroy');
+    });
+
+    $router->group(['prefix'=>'diary'], function () use ($router){
+        $router->get('/', 'DiaryController@index');
+        $router->delete('/{id}', 'DiaryController@destroy');
+        $router->delete('/', 'DiaryController@destroyAll');
+    });
+
+    $router->group(['prefix'=>'conversation'], function () use ($router){
+        $router->get('/', 'ConversationController@index');
+    });
+
+    $router->group(['prefix'=>'message'], function () use ($router){
+        $router->get('', 'MessageController@index');
+        $router->post('/', 'MessageController@store');
+        $router->delete('/{id}', 'MessageController@destroy');
+        $router->delete('/delete_all/{id}', 'MessageController@destroyAll');
+    });
 });
 
 
