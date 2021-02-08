@@ -36,14 +36,25 @@ class Comment extends Model implements AuthenticatableContract, AuthorizableCont
         'password',
     ];
 
-    public function getData($id)
+    public function getData($postId, $lastCommentId)
     {
+        $match1 = [
+            'deleted_flag'=>false,
+            'post_id'=>new ObjectId($postId)
+        ];
+        $match2 = [
+            'deleted_flag'=>false,
+            'post_id'=>new ObjectId($postId),
+            '_id'=>['$gte'=>new ObjectId($lastCommentId)]
+        ];
+        if (empty($lastMessageId))
+        {
+            $match = $match1;
+        }
+        else $match = $match2;
         $pipeline = [
             [
-                '$match'=>[
-                    'deleted_flag'=>false,
-                    'post_id'=>new ObjectId($id)
-                ]
+                '$match'=>$match
             ],
             [
                 '$lookup'=>[
@@ -66,8 +77,11 @@ class Comment extends Model implements AuthenticatableContract, AuthorizableCont
             ],
             [
                 '$sort'=>[
-                    'created_at'=>1
+                    'created_at'=>-1
                 ]
+            ],
+            [
+                '$limit'=>3
             ]
         ];
         $options = [

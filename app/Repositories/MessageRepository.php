@@ -14,9 +14,9 @@ class MessageRepository extends BaseRepository
         $this->model = $model;
     }
 
-    public function getMessagesOfConversation($conversationId)
+    public function getMessagesOfConversation($conversationId, $lastMessageId)
     {
-        return $this->model->getData($conversationId);
+        return $this->model->getData($conversationId, $lastMessageId);
     }
 
 }

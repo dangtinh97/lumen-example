@@ -9,6 +9,7 @@ use App\Http\Responses\ResponseSuccess;
 use App\Repositories\UserRepository;
 use Illuminate\Support\Facades\Hash;
 use MongoDB\BSON\ObjectId;
+use MongoDB\BSON\UTCDateTime;
 
 class UserService
 {
@@ -24,7 +25,7 @@ class UserService
         $create = $this->userRepository->create([
             'full_name' => $request->get('full_name'),
             'password' => Hash::make($request->get('password')),
-            'birthday' => date('Y-m-d', strtotime($request->get('birthday'))),
+            'birthday' => (new UTCDateTime(strtotime($request->get('birthday'))*1000)),
             'gender' => $request->get('gender'),
             'email' => $request->get('email'),
             'phone' => $request->get('phone'),
@@ -69,7 +70,7 @@ class UserService
         $update->full_name = $request->get('full_name');
 //        dd($update->full_name);
         $update->password = Hash::make($request->get('password'));
-        $update->birthday = $request->get('birthday');
+        $update->birthday = new UTCDateTime(strtotime($request->get('birthday'))*1000);
         $update->gender = $request->get('gender');
         $update->phone = $request->get('phone');
         $update->save();

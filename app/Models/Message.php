@@ -36,18 +36,18 @@ class Message extends Model implements AuthenticatableContract, AuthorizableCont
         'password',
     ];
 
-    public function getData($id)
+    public function getData($conversationId, $lastMessageId)
     {
         $pipeline = [
             [
                 '$match'=>[
                     'deleted_flag'=>false,
-                    'conversation_id'=>new ObjectId($id)
+                    'conversation_id'=>new ObjectId($conversationId),
                 ]
             ],
             [
                 '$project'=>[
-                    '_id'=>0,
+                    '_id'=>1,
                     'content'=>1,
                     'created_at'=>1,
                     'send_id'=>1,
@@ -56,8 +56,11 @@ class Message extends Model implements AuthenticatableContract, AuthorizableCont
             ],
             [
                 '$sort'=>[
-                    'created_at'=>1
+                    'created_at'=>-1
                 ]
+            ],
+            [
+                '$limit'=>3
             ]
         ];
         $options = [
@@ -67,12 +70,15 @@ class Message extends Model implements AuthenticatableContract, AuthorizableCont
                 'root'=>'array',
             ]
         ];
+        if(!empty($lastMessageId))
+        {
+            $pipeline[0]['$match']['_id'] = ['$gte'=>new ObjectId($lastMessageId)];
+        }
         $result = self::raw(function ($collection) use ($pipeline, $options){
             return $collection->aggregate($pipeline, $options);
         });
         return $result;
     }
-
 
 }
 

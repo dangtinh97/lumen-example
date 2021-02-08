@@ -13,19 +13,17 @@ class UserController extends Controller{
         $this->validate($request,[
             'full_name'=>'required',
             'password'=>'nullable|min:8',
-            'birthday'=>'required',
+            'birthday'=>'required|date',
             'gender'=>'required',
             'email'=>'required|unique:users|email',
-            'phone'=>'nullable|numeric|unique:users',
+            'phone'=>'nullable|digits:10|unique:users',
         ],[
-            'full_name.required'=>'Ten khong duoc de trong',
-            'password.min'=>'Mat khau phai lon hon 8 ky tu',
-            'birthday.required'=>'Ngay sinh khong duoc de trong',
-            'gender.required'=>'Gioi tinh khong duoc de trong',
-            'email.unique'=>'Email da ton tai',
-            'email.email'=>'Email chua dung dinh dang',
-            'phone.numberic'=>'So dien thoai chi co cac so',
-            'phone.unique'=>'Da ton tai sdt',
+            'required'=>':attribute không đúng định dạng',
+            'min'=>':attribute phải lớn hơn 8 ký tự',
+            'date'=>':attribute không đúng định dạng',
+            'email'=>':attribute không đúng định dạng',
+            'digits'=>':attribute phải là số và dài 10 ký tự',
+            'unique'=>':attribute đã tồn tại'
         ]);
         $create = $this->userService->create($request);
         return response()->json($create->toArray());

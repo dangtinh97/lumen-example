@@ -26,7 +26,8 @@ class CommentController extends Controller
     public function index(Request $request)
     {
         $this->validate($request,[
-            'post_id'=>'required|exists:posts,_id'
+            'post_id'=>'required|exists:posts,_id',
+            'last_comment_id'=>'exists:comments,_id',
         ],[
             'required' => ':attribute không được để trống',
             'exists'=> ':attribute phải có trong bảng post'

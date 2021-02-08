@@ -10,6 +10,8 @@ use App\Models\Comment;
 use App\Models\Diary;
 use App\Repositories\CommentRepository;
 use App\Repositories\DiaryRepository;
+use App\Repositories\NotificationRepository;
+use App\Repositories\PostRepository;
 use http\Message;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Hash;
@@ -22,16 +24,20 @@ class CommentService
 {
     protected $commentRepository;
     protected $diaryRepository;
+    protected $notificationRepository;
+    protected $postRepository;
 
-    public function __construct(CommentRepository $commentRepository, DiaryRepository $diaryRepository)
+    public function __construct(CommentRepository $commentRepository, DiaryRepository $diaryRepository, NotificationRepository $notificationRepository, PostRepository $postRepository)
     {
         $this->commentRepository = $commentRepository;
         $this->diaryRepository = $diaryRepository;
+        $this->notificationRepository = $notificationRepository;
+        $this->postRepository = $postRepository;
     }
 
     public  function listComment($request)
     {
-        $listComment = $this->commentRepository->getCommentsOfPost($request->get('post_id'));
+        $listComment = $this->commentRepository->getCommentsOfPost($request->get('post_id'), $request->get('last_comment_id'));
         return (new ResponseSuccess($listComment, 'List comment of post:'));
     }
 
@@ -45,6 +51,13 @@ class CommentService
         $this->diaryRepository->create([
             'user_id'=>new ObjectId(Auth::id()),
             'post_id'=>new ObjectId($request->get('post_id')),
+            'type'=>'comment'
+        ]);
+        $post = $this->postRepository->findById($request->get('post_id'));
+        $this->notificationRepository->create([
+            'user_id_create_post'=>new ObjectId($post->user_id),
+            'post_id'=>new ObjectId($request->get('post_id')),
+            'user_id'=>new ObjectId(Auth::id()),
             'type'=>'comment'
         ]);
         return (new ResponseSuccess($comment,'Tạo comment thành công!'));

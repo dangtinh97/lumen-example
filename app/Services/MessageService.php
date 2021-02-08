@@ -25,7 +25,7 @@ class MessageService
 
     public function listMessage($request)
     {
-        $listMessage = $this->messageRepository->getMessagesOfConversation($request->get('conversation_id'));
+        $listMessage = $this->messageRepository->getMessagesOfConversation($request->get('conversation_id'), $request->get('last_message_id'));
         return (new ResponseSuccess($listMessage, 'List message:'));
     }
 

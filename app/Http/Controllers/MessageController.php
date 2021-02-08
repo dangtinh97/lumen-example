@@ -25,9 +25,11 @@ class MessageController extends Controller
     {
         $this->validate($request,[
             'conversation_id'=>'required|exists:conversations,_id',
+            'last_message_id'=>'exists:messages,_id',
         ],[
             'required' => ':attribute không được để trống',
-            'exists'=>':attribute phải có trong bảng conversations'
+            'conversation_id.exists'=>'conversation_id phải có trong bảng conversations',
+            'last_message_id.exists'=>'message_id phải có trong bảng messages'
         ]);
         $list = $this->messageService->listMessage($request);
         return response()->json($list->toArray());

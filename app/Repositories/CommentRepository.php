@@ -15,8 +15,8 @@ class CommentRepository extends BaseRepository
         $this->model = $model;
     }
 
-    public function getCommentsOfPost($postId)
+    public function getCommentsOfPost($postId, $lastCommentId)
     {
-        return $this->model->getData($postId);
+        return $this->model->getData($postId, $lastCommentId);
     }
 }
