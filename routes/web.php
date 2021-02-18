@@ -44,6 +44,20 @@ $router->group(['prefix'=>'/', 'middleware'=>'api'], function () use ($router){
         $router->delete('/{id}', 'MessageController@destroy');
         $router->delete('/delete_all/{id}', 'MessageController@destroyAll');
     });
+
+    $router->group(['prefix'=>'product'], function () use ($router){
+        $router->get('', 'ProductController@index');
+        $router->post('', 'ProductController@store');
+    });
+
+    $router->group(['prefix'=>'category'], function () use ($router){
+        $router->post('', 'CategoryController@store');
+    });
+
+    $router->group(['prefix'=>'order'], function () use ($router){
+        $router->get('', 'OrderController@index');
+        $router->post('', 'OrderController@store');
+    });
 });
 
 
