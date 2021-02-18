@@ -22,6 +22,13 @@ class ProductController extends Controller
 
     public function index(Request $request)
     {
+        $this->validate($request,[
+            'category_id' => 'regex:/^[a-f\d]{24}$/i',
+            'last_product_id' => 'regex:/^[a-f\d]{24}$/i',
+        ],
+        [
+            'regex' => ':attribute phải là dạng Object Id'
+        ]);
         $list = $this->productService->listProduct($request->get('category_id'), $request->get('last_product_id'));
         return response()->json($list->toArray());
     }

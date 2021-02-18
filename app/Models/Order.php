@@ -7,6 +7,7 @@ use Illuminate\Contracts\Auth\Access\Authorizable as AuthorizableContract;
 use Illuminate\Contracts\Auth\Authenticatable as AuthenticatableContract;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 
+use Illuminate\Support\Facades\Auth;
 use Jenssegers\Mongodb\Eloquent\Model;
 use Laravel\Lumen\Auth\Authorizable;
 use MongoDB\BSON\ObjectId;
@@ -25,6 +26,11 @@ class Order extends Model implements AuthenticatableContract, AuthorizableContra
     protected $fillable = [
         'product_id', 'user_id', 'amount'
     ];
+
+    public function setProductIdAttribute($value)
+    {
+        $this->attributes['product_id'] = new ObjectId($value);
+    }
 
     public function setUserIdAttribute($value)
     {
@@ -90,8 +96,11 @@ class Order extends Model implements AuthenticatableContract, AuthorizableContra
                 'root' => 'array',
             ]
         ];
+        if (empty($userId)) {
+            $pipeline[0]['$match']['user_id'] = new ObjectId(Auth::id());
+        }
         if (!empty($userId)) {
-            $pipeline[0]['$match']['user_id'] = $userId;
+            $pipeline[0]['$match']['user_id'] = new ObjectId($userId);
         }
         if (!empty($lastOrderId)) {
             $pipeline[0]['$match']['_id'] = ['$gte' => new ObjectId($lastOrderId)];

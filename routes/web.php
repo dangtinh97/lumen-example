@@ -57,6 +57,8 @@ $router->group(['prefix'=>'/', 'middleware'=>'api'], function () use ($router){
     $router->group(['prefix'=>'order'], function () use ($router){
         $router->get('', 'OrderController@index');
         $router->post('', 'OrderController@store');
+        $router->put('/{id}', 'OrderController@update');
+        $router->delete('/{id}', 'OrderController@destroy');
     });
 });
 
