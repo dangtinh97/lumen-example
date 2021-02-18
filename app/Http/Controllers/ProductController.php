@@ -34,7 +34,7 @@ class ProductController extends Controller
             'amount' => 'bail|required|integer'
         ], [
             'required' => ':attribute không được để trống',
-            'regex' => ':attribute không phải là Object Id',
+            'regex' => ':attribute phải là dạng Object Id',
             'exists' => ':attribute phải có trong bảng categories',
             'integer' => ':attribute phải là số nguyên'
         ]);

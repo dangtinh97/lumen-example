@@ -32,7 +32,7 @@ class OrderController extends Controller
             'amount' => 'bail|required|integer'
         ], [
             'required' => ':attribute không được để trống',
-            'regex' => ':attribute phải là dạng là Object Id',
+            'regex' => ':attribute phải là dạng Object Id',
             'exists' => ':attribute phải có trong bảng products',
             'integer' => ':attribute phải là số nguyên'
         ]);

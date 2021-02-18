@@ -27,7 +27,7 @@ class CategoryController extends Controller
             'parent_id' => 'bail|required|regex:/^[a-f\d]{24}$/i'
         ], [
             'required' => ':attribute không được để trống',
-            'regex' => ':attribute không phải là Object Id',
+            'regex' => ':attribute phải là dạng Object Id',
         ]);
         $data = $request->only([
             'name',
